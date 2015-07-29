@@ -8,20 +8,20 @@ db.on('error', function (err) {
 
 var models = {};
 
-var AuthorizationCodeSchema = mongoose.Schema({
+var OAuthCodeSchema = mongoose.Schema({
 	code         : String,
 	client_id    : String, //oauth client
 	redirect_uri : String,
 	user_id      : String
 });
-models.AuthorizationCode = mongoose.model('AuthorizationCode', AuthorizationCodeSchema);
+models.OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 
-var AccessTokenSchema = mongoose.Schema({
+var OAuthAccessTokenSchema = mongoose.Schema({
 	token     : String,
 	client_id : String, //oauth client
 	user_id   : String
 });
-models.AccessToken = mongoose.model('AccessToken', AccessTokenSchema);
+models.OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
 var UserSchema = mongoose.Schema({
 	_id      : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },

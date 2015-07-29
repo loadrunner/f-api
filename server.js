@@ -81,7 +81,7 @@ passport.use(new (require('passport-oauth2-client-password').Strategy)(
 
 passport.use(new (require('passport-http-bearer').Strategy)(
 	function(token, done) {
-		db.models.AccessToken.findOne({token : token}, function(err, token) {
+		db.models.OAuthAccessToken.findOne({token : token}, function(err, token) {
 			if (err)
 				return done(err);
 			if (!token)
@@ -117,7 +117,7 @@ oauth.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, don
 	console.log("grant auth code");
 	var code = utils.uid(16)
 	
-	var authCode = db.models.AuthorizationCode({code : code, client_id : client.name, redirect_uri : redirectURI, user_id : user._id});
+	var authCode = db.models.OAuthCode({code : code, client_id : client.name, redirect_uri : redirectURI, user_id : user._id});
 	authCode.save(function (err, obj) {
 		if (err)
 			done(err);
@@ -128,7 +128,7 @@ oauth.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, don
 
 oauth.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, done) {
 	console.log("exchange auth code with token");
-	db.models.AuthorizationCode.findOne({code : code}, function(err, authCode) {
+	db.models.OAuthCode.findOne({code : code}, function(err, authCode) {
 		console.log(authCode);
 		console.log(client);
 		if (err)return done(err);
@@ -141,7 +141,7 @@ oauth.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, don
 			if(err)
 				return done(err);
 			var token = utils.uid(256);
-			var accessToken = db.models.AccessToken({token : token, user_id : authCode.user_id, client_id : authCode.client_id});
+			var accessToken = db.models.OAuthAccessToken({token : token, user_id : authCode.user_id, client_id : authCode.client_id});
 			accessToken.save(function(err) {
 				if (err)
 					done(err);
@@ -165,7 +165,7 @@ oauth.exchange(oauth2orize.exchange.password(function(client, username, password
 		
 		//TODO : implement scope and expire
 		var token = utils.uid(256);
-		var accessToken = db.models.AccessToken({token : token, user_id : user._id, client_id : client.id});
+		var accessToken = db.models.OAuthAccessToken({token : token, user_id : user._id, client_id : client.id});
 		accessToken.save(function(err) {
 			if (err)
 				done(err);
