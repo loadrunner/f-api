@@ -12,14 +12,14 @@ var OAuthCodeSchema = mongoose.Schema({
 	code         : String,
 	client_id    : String, //oauth client
 	redirect_uri : String,
-	user_id      : String
+	user_id      : mongoose.Schema.Types.ObjectId
 });
 models.OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 
 var OAuthAccessTokenSchema = mongoose.Schema({
 	token     : String,
 	client_id : String, //oauth client
-	user_id   : String
+	user_id   : mongoose.Schema.Types.ObjectId
 });
 models.OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
