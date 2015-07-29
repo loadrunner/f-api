@@ -234,7 +234,7 @@ clientsRouter.post('/', function(req, res, next) {
 });
 
 clientsRouter.delete('/:id', function(req, res, next) {
-	db.models.Client.findOne(req.params.id, function (err, doc) {
+	db.models.Client.findById(req.params.id, function (err, doc) {
 		if (err)
 			return next(err);
 		
