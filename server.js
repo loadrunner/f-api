@@ -248,4 +248,28 @@ clientsRouter.delete('/:id', function(req, res, next) {
 
 app.use('/clients', passport.authenticate('bearer', { session : false }), clientsRouter);
 
+var usersRouter = express.Router();
+
+usersRouter.get('/', function(req, res, next) {
+	db.models.User.find({
+			_id : req.user._id //TODO: maybe add admin rights
+	}, function (err, clients) {
+		if (err)
+			return next(err);
+		
+		res.json(clients);
+	});
+});
+
+usersRouter.get('/me', function(req, res, next) {
+	db.models.User.findById(req.user._id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		res.json(doc);
+	});
+});
+
+app.use('/users', passport.authenticate('bearer', { session : false }), usersRouter);
+
 app.listen(3000);
