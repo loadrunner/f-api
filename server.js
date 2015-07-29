@@ -278,6 +278,101 @@ clientsRouter.delete('/:id', function(req, res, next) {
 
 app.use('/clients', passport.authenticate('bearer', { session : false }), clientsRouter);
 
+var invoicesRouter = express.Router();
+
+invoicesRouter.get('/', function(req, res, next) {
+	db.models.Invoice.find({
+			user_id : req.user._id
+	}, function (err, invoices) {
+		if (err)
+			return next(err);
+		
+		res.json(invoices);
+	});
+});
+
+invoicesRouter.post('/', function(req, res, next) {
+	if (!req.body)
+		return next(err);
+	if (!req.body.client_id)
+		return next(err);
+	
+	db.models.Client.findById(req.body.client_id, function (err, client) {
+		if (err)
+			return next(err);
+		
+		if (!client.user_id.equals(req.user._id))
+			return res.status(400).send('Bad request');
+		
+		db.models.Invoice.create({
+			user_id : req.user._id,
+			client  : {
+				_id  : client._id,
+				name : client.name,
+				cui  : client.cui
+			},
+			number  : req.body.number
+		}, function (err, doc) {
+			if (err)
+				return next(err);
+			
+			res.json(doc);
+		});
+	});
+});
+
+invoicesRouter.get('/:id', function(req, res, next) {
+	db.models.Invoice.findById(req.params.id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		if (!doc.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		res.json(doc);
+	});
+});
+
+invoicesRouter.put('/:id', function(req, res, next) {
+	db.models.Invoice.findById(req.params.id, function (err, invoice) {
+		if (err)
+			return next(err);
+		
+		if (!invoice.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		db.models.Client.findById(req.body.client_id, function (err, client) {
+			if (err)
+				return next(err);
+			
+			if (!invoice.user_id.equals(req.user._id))
+				return res.status(400).send('Bad request');
+			
+			invoice.number = req.body.number;
+			
+			invoice.save(function () {// TODO: maybe check for error
+				res.json(invoice);
+			})
+		});
+	});
+});
+
+invoicesRouter.delete('/:id', function(req, res, next) {
+	db.models.Invoice.findById(req.params.id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		if (!doc.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		doc.remove(function () {// TODO: maybe check for error
+			res.json(doc);
+		});
+	});
+});
+
+app.use('/invoices', passport.authenticate('bearer', { session : false }), invoicesRouter);
+
 var usersRouter = express.Router();
 
 usersRouter.get('/', function(req, res, next) {

@@ -42,6 +42,18 @@ var ClientSchema = mongoose.Schema({
 });
 models.Client = mongoose.model('Client', ClientSchema);
 
+var InvoiceSchema = mongoose.Schema({
+	_id     : { type : mongoose.Schema.Types.ObjectId, auto: true },
+	user_id : mongoose.Schema.Types.ObjectId,
+	client  : {
+		_id  : mongoose.Schema.Types.ObjectId,
+		name : String,
+		cui  : String
+	},
+	number  : String
+});
+models.Invoice = mongoose.model('Invoice', InvoiceSchema);
+
 exports.connection = db;
 exports.models = models;
 exports.types = mongoose.Types;
