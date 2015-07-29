@@ -224,11 +224,25 @@ clientsRouter.post('/', function(req, res, next) {
 	db.models.Client.create({
 		name    : req.body.name,
 		user_id : req.user._id
-	}, function (err, post) {
+	}, function (err, doc) {
 		if (err)
 			return next(err);
 		
-		res.json(post);
+		res.json(doc);
+	});
+});
+
+clientsRouter.delete('/:id', function(req, res, next) {
+	db.models.Client.findOne(req.params.id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		if (!doc.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		doc.remove(function () {// TODO: maybe check for error
+			res.json(doc);
+		});
 	});
 });
 
