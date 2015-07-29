@@ -24,9 +24,13 @@ var OAuthAccessTokenSchema = mongoose.Schema({
 models.OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
 var UserSchema = mongoose.Schema({
-	_id      : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
-	username : String,
-	password : String
+	_id        : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
+	username   : String,
+	password   : String,
+	email      : String,
+	first_name : String,
+	last_name  : String,
+	phone      : String
 });
 models.User = mongoose.model('User', UserSchema);
 
