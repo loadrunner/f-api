@@ -1,0 +1,27 @@
+{
+  "name": "facturi-api",
+  "description": "facturi desc",
+  "author": {
+    "name": "Danut Chereches",
+    "email": "load.runner@weednet.ro",
+    "url": "http://weednet.ro"
+  },
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.13.x",
+    "express-session": "1.11.x",
+    "body-parser": "1.13.x",
+    "ejs": "2.3.x",
+    "mongoose": "4.1.x",
+    "oauth2orize": "1.0.x",
+    "passport": "0.2.x",
+    "passport-local": "1.0.x",
+    "passport-http": "0.2.x",
+    "passport-http-bearer": "1.0.x",
+    "passport-oauth2-client-password": "0.1.x",
+    "connect-ensure-login": "0.1.x",
+    "winston": "1.0.x",
+    "winston-papertrail": "1.0.x"
+  }
+}
