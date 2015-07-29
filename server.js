@@ -210,7 +210,9 @@ app.get('/first_endpoint', passport.authenticate('bearer', { session : false }),
 var clientsRouter = express.Router();
 
 clientsRouter.get('/', function(req, res, next) {
-	db.models.Client.find(function (err, clients) {
+	db.models.Client.find({
+			user_id : req.user._id
+	}, function (err, clients) {
 		if (err)
 			return next(err);
 		
@@ -219,7 +221,10 @@ clientsRouter.get('/', function(req, res, next) {
 });
 
 clientsRouter.post('/', function(req, res, next) {
-	db.models.Client.create(req.body, function (err, post) {
+	db.models.Client.create({
+		name    : req.body.name,
+		user_id : req.user._id
+	}, function (err, post) {
 		if (err)
 			return next(err);
 		

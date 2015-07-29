@@ -9,28 +9,31 @@ db.on('error', function (err) {
 var models = {};
 
 var AuthorizationCodeSchema = mongoose.Schema({
-	code: String,
-	client_id: String,
-	redirect_uri: String,
-	user_id: String
+	code         : String,
+	client_id    : String, //oauth client
+	redirect_uri : String,
+	user_id      : String
 });
 models.AuthorizationCode = mongoose.model('AuthorizationCode', AuthorizationCodeSchema);
 
 var AccessTokenSchema = mongoose.Schema({
-	token: String,
-	client_id: String,
-	user_id: String
+	token     : String,
+	client_id : String, //oauth client
+	user_id   : String
 });
 models.AccessToken = mongoose.model('AccessToken', AccessTokenSchema);
 
 var UserSchema = mongoose.Schema({
-	username: String,
-	password: String
+	_id      : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
+	username : String,
+	password : String
 });
 models.User = mongoose.model('User', UserSchema);
 
 var ClientSchema = mongoose.Schema({
-	name: String
+	_id     : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
+	user_id : mongoose.Schema.Types.ObjectId,
+	name    : String
 });
 models.Client = mongoose.model('Client', ClientSchema);
 
