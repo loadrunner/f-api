@@ -227,6 +227,6 @@ clientsRouter.post('/', function(req, res, next) {
 	});
 });
 
-app.use('/clients', /*passport.authenticate('bearer', { session : false }),*/ clientsRouter);
+app.use('/clients', passport.authenticate('bearer', { session : false }), clientsRouter);
 
 app.listen(3000);
