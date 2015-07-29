@@ -233,6 +233,35 @@ clientsRouter.post('/', function(req, res, next) {
 	});
 });
 
+clientsRouter.get('/:id', function(req, res, next) {
+	db.models.Client.findById(req.params.id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		if (!doc.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		res.json(doc);
+	});
+});
+
+clientsRouter.put('/:id', function(req, res, next) {
+	db.models.Client.findById(req.params.id, function (err, doc) {
+		if (err)
+			return next(err);
+		
+		if (!doc.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		doc.name = req.body.name;
+		doc.cui = req.body.cui;
+		
+		doc.save(function () {// TODO: maybe check for error
+			res.json(doc);
+		})
+	});
+});
+
 clientsRouter.delete('/:id', function(req, res, next) {
 	db.models.Client.findById(req.params.id, function (err, doc) {
 		if (err)
