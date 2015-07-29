@@ -24,7 +24,7 @@ var OAuthAccessTokenSchema = mongoose.Schema({
 models.OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
 var UserSchema = mongoose.Schema({
-	_id        : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
+	_id        : { type : mongoose.Schema.Types.ObjectId, auto: true },
 	username   : String,
 	password   : String,
 	email      : String,
@@ -35,7 +35,7 @@ var UserSchema = mongoose.Schema({
 models.User = mongoose.model('User', UserSchema);
 
 var ClientSchema = mongoose.Schema({
-	_id     : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
+	_id     : { type : mongoose.Schema.Types.ObjectId, auto: true },
 	user_id : mongoose.Schema.Types.ObjectId,
 	name    : String,
 	cui     : String
