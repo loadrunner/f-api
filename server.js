@@ -222,8 +222,9 @@ clientsRouter.get('/', function(req, res, next) {
 
 clientsRouter.post('/', function(req, res, next) {
 	db.models.Client.create({
+		user_id : req.user._id,
 		name    : req.body.name,
-		user_id : req.user._id
+		cui     : req.body.cui
 	}, function (err, doc) {
 		if (err)
 			return next(err);

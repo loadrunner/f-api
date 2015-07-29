@@ -37,7 +37,8 @@ models.User = mongoose.model('User', UserSchema);
 var ClientSchema = mongoose.Schema({
 	_id     : { type : mongoose.Schema.Types.ObjectId, default : new mongoose.Types.ObjectId() },
 	user_id : mongoose.Schema.Types.ObjectId,
-	name    : String
+	name    : String,
+	cui     : String
 });
 models.Client = mongoose.model('Client', ClientSchema);
 
