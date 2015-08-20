@@ -42,15 +42,29 @@ var ClientSchema = mongoose.Schema({
 });
 models.Client = mongoose.model('Client', ClientSchema);
 
-var InvoiceSchema = mongoose.Schema({
+var ProductSchema = mongoose.Schema({
 	_id     : { type : mongoose.Schema.Types.ObjectId, auto: true },
 	user_id : mongoose.Schema.Types.ObjectId,
-	client  : {
+	name    : String,
+	price   : Number
+});
+models.Product = mongoose.model('Product', ProductSchema);
+
+var InvoiceSchema = mongoose.Schema({
+	_id      : { type : mongoose.Schema.Types.ObjectId, auto: true },
+	user_id  : mongoose.Schema.Types.ObjectId,
+	client   : {
 		_id  : mongoose.Schema.Types.ObjectId,
 		name : String,
 		cui  : String
 	},
-	number  : String
+	number   : String,
+	products : [{
+		_id      : mongoose.Schema.Types.ObjectId,
+		name     : String,
+		price    : Number,
+		quantity : Number
+	}]
 });
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);
 
