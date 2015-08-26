@@ -8,6 +8,12 @@ var login = require('connect-ensure-login');
 var db = require('./db');
 var utils = require('./utils');
 
+//resources
+var clients = require('./resources/clients.js');
+var products = require('./resources/products.js');
+var invoices = require('./resources/invoices.js');
+var users = require('./resources/users.js');
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({ extended : false }));
@@ -29,7 +35,7 @@ app.get('/', function (req, res) {
 });
 
 
-var clients = [{
+var oauthApps = [{
 	name : 'test_cl',
 	secret : 'big_s'
 }];
@@ -60,9 +66,9 @@ passport.deserializeUser(function(id, done) {
 passport.use(new (require('passport-http').BasicStrategy)(
 	function(username, password, done) {
 		console.log("basicstrategy");
-		for (var i = 0; i < clients.length; i++)
-			if (clients[i].name == username && clients[i].secret == password)
-				return done(null, clients[i]);
+		for (var i = 0; i < oauthApps.length; i++)
+			if (oauthApps[i].name == username && oauthApps[i].secret == password)
+				return done(null, oauthApps[i]);
 		
 		return done(null, false);
 	}
@@ -71,9 +77,9 @@ passport.use(new (require('passport-http').BasicStrategy)(
 passport.use(new (require('passport-oauth2-client-password').Strategy)(
 	function(clientId, clientSecret, done) {
 		console.log("clientpassstrategy");
-		for (var i = 0; i < clients.length; i++)
-			if (clients[i].name == clientId && clients[i].secret == clientSecret)
-				return done(null, clients[i]);
+		for (var i = 0; i < oauthApps.length; i++)
+			if (oauthApps[i].name == clientId && oauthApps[i].secret == clientSecret)
+				return done(null, oauthApps[i]);
 		
 		return done(null, false);
 	}
@@ -106,9 +112,9 @@ oauth.serializeClient(function(client, done) {
 });
 
 oauth.deserializeClient(function(id, done) {
-	for (var i = 0; i < clients.length; i++)
-		if (clients[i].name == id)
-			return done(null, clients[i]);
+	for (var i = 0; i < oauthApps.length; i++)
+		if (oauthApps[i].name == id)
+			return done(null, oauthApps[i]);
 		
 		return done(null, false);
 });
@@ -185,9 +191,9 @@ app.get('/oauth/authorize', login.ensureLoggedIn('/oauth/login'),
 //passport.authenticate(['local'], { session : false }),
 oauth.authorization(function(clientId, redirectURI, done) {
 	console.log("authxx");
-	for (var i = 0; i < clients.length; i++)
-			if (clients[i].name == clientId)
-				return done(null, clients[i], redirectURI);
+	for (var i = 0; i < oauthApps.length; i++)
+			if (oauthApps[i].name == clientId)
+				return done(null, oauthApps[i], redirectURI);
 	
 	return done(null, false);
 }),
@@ -206,293 +212,9 @@ app.get('/first_endpoint', passport.authenticate('bearer', { session : false }),
 	});
 });
 
-
-var clientsRouter = express.Router();
-
-clientsRouter.get('/', function(req, res, next) {
-	db.models.Client.find({
-			user_id : req.user._id
-	}, function (err, clients) {
-		if (err)
-			return next(err);
-		
-		res.json(clients);
-	});
-});
-
-clientsRouter.post('/', function(req, res, next) {
-	db.models.Client.create({
-		user_id : req.user._id,
-		name    : req.body.name,
-		cui     : req.body.cui
-	}, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		res.json(doc);
-	});
-});
-
-clientsRouter.get('/:id', function(req, res, next) {
-	db.models.Client.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		res.json(doc);
-	});
-});
-
-clientsRouter.put('/:id', function(req, res, next) {
-	db.models.Client.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		doc.name = req.body.name;
-		doc.cui = req.body.cui;
-		
-		doc.save(function () {// TODO: maybe check for error
-			res.json(doc);
-		})
-	});
-});
-
-clientsRouter.delete('/:id', function(req, res, next) {
-	db.models.Client.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		doc.remove(function () {// TODO: maybe check for error
-			res.json(doc);
-		});
-	});
-});
-
-app.use('/clients', passport.authenticate('bearer', { session : false }), clientsRouter);
-
-var productsRouter = express.Router();
-
-productsRouter.get('/', function(req, res, next) {
-	db.models.Product.find({
-			user_id : req.user._id
-	}, function (err, products) {
-		if (err)
-			return next(err);
-		
-		res.json(products);
-	});
-});
-
-productsRouter.post('/', function(req, res, next) {
-	db.models.Product.create({
-		user_id : req.user._id,
-		name    : req.body.name,
-		price   : req.body.price
-	}, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		res.json(doc);
-	});
-});
-
-productsRouter.get('/:id', function(req, res, next) {
-	db.models.Product.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		res.json(doc);
-	});
-});
-
-productsRouter.put('/:id', function(req, res, next) {
-	db.models.Product.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		doc.name = req.body.name;
-		doc.price = req.body.price;
-		
-		doc.save(function () {// TODO: maybe check for error
-			res.json(doc);
-		})
-	});
-});
-
-productsRouter.delete('/:id', function(req, res, next) {
-	db.models.Product.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		doc.remove(function () {// TODO: maybe check for error
-			res.json(doc);
-		});
-	});
-});
-
-app.use('/products', passport.authenticate('bearer', { session : false }), productsRouter);
-
-var invoicesRouter = express.Router();
-
-invoicesRouter.get('/', function(req, res, next) {
-	db.models.Invoice.find({
-			user_id : req.user._id
-	}, function (err, invoices) {
-		if (err)
-			return next(err);
-		
-		res.json(invoices);
-	});
-});
-
-invoicesRouter.post('/', function(req, res, next) {
-	if (!req.body)
-		return res.status(400);
-	if (!req.body.client || !req.body.client.name || !req.body.client.cui)
-		return res.status(400).send('Invalid client info');
-	
-	var save = function (client) {
-		db.models.Invoice.create({
-			user_id : req.user._id,
-			client  : client,
-			number  : req.body.number
-		}, function (err, doc) {
-			if (err)
-				return next(err);
-			
-			res.json(doc);
-		});
-	};
-	
-	if (req.body.client._id) {
-		db.models.Client.findById(req.body.client._id, function (err, client) {
-			if (err || !client)
-				return next(err);
-			
-			if (!client.user_id.equals(req.user._id))
-				return res.status(400).send('Bad request');
-			
-			save({
-				_id  : client._id,
-				name : req.body.client.name,
-				cui  : req.body.client.cui
-			});
-		});
-	} else {
-		save({
-			name : req.body.client.name,
-			cui  : req.body.client.cui
-		});
-	}
-});
-
-invoicesRouter.get('/:id', function(req, res, next) {
-	db.models.Invoice.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		res.json(doc);
-	});
-});
-
-invoicesRouter.put('/:id', function(req, res, next) {
-	db.models.Invoice.findById(req.params.id, function (err, invoice) {
-		if (err)
-			return next(err);
-		
-		if (!invoice.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		var save = function (client) {
-			invoice.number = req.body.number;
-			invoice.client = client;
-			
-			invoice.save(function () {// TODO: maybe check for error
-				res.json(invoice);
-			})
-		};
-		
-		if (req.body.client._id) {
-			db.models.Client.findById(req.body.client._id, function (err, client) {
-				if (err || !client)
-					return next(err);
-				
-				if (!invoice.user_id.equals(req.user._id))
-					return res.status(400).send('Bad request');
-				
-				save({
-					_id  : client._id,
-					name : req.body.client.name,
-					cui  : req.body.client.cui
-				});
-			});
-		} else {
-			save({
-				name : req.body.client.name,
-				cui  : req.body.client.cui
-			});
-		}
-	});
-});
-
-invoicesRouter.delete('/:id', function(req, res, next) {
-	db.models.Invoice.findById(req.params.id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		if (!doc.user_id.equals(req.user._id))
-			return res.status(404).send('Not found');
-		
-		doc.remove(function () {// TODO: maybe check for error
-			res.json(doc);
-		});
-	});
-});
-
-app.use('/invoices', passport.authenticate('bearer', { session : false }), invoicesRouter);
-
-var usersRouter = express.Router();
-
-usersRouter.get('/', function(req, res, next) {
-	db.models.User.find({
-			_id : req.user._id //TODO: maybe add admin rights
-	}, function (err, clients) {
-		if (err)
-			return next(err);
-		
-		res.json(clients);
-	});
-});
-
-usersRouter.get('/me', function(req, res, next) {
-	db.models.User.findById(req.user._id, function (err, doc) {
-		if (err)
-			return next(err);
-		
-		res.json(doc);
-	});
-});
-
-app.use('/users', passport.authenticate('bearer', { session : false }), usersRouter);
+app.use('/clients', passport.authenticate('bearer', { session : false }), clients.router);
+app.use('/products', passport.authenticate('bearer', { session : false }), products.router);
+app.use('/invoices', passport.authenticate('bearer', { session : false }), invoices.router);
+app.use('/users', passport.authenticate('bearer', { session : false }), users.router);
 
 app.listen(3000);
