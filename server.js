@@ -365,23 +365,13 @@ invoicesRouter.get('/', function(req, res, next) {
 invoicesRouter.post('/', function(req, res, next) {
 	if (!req.body)
 		return res.status(400);
-	if (!req.body.client_id)
-		return res.status(400).send("'client_id' is required");
+	if (!req.body.client || !req.body.client.name || !req.body.client.cui)
+		return res.status(400).send('Invalid client info');
 	
-	db.models.Client.findById(req.body.client_id, function (err, client) {
-		if (err)
-			return next(err);
-		
-		if (!client.user_id.equals(req.user._id))
-			return res.status(400).send('Bad request');
-		
+	var save = function (client) {
 		db.models.Invoice.create({
 			user_id : req.user._id,
-			client  : {
-				_id  : client._id,
-				name : client.name,
-				cui  : client.cui
-			},
+			client  : client,
 			number  : req.body.number
 		}, function (err, doc) {
 			if (err)
@@ -389,7 +379,28 @@ invoicesRouter.post('/', function(req, res, next) {
 			
 			res.json(doc);
 		});
-	});
+	};
+	
+	if (req.body.client._id) {
+		db.models.Client.findById(req.body.client._id, function (err, client) {
+			if (err || !client)
+				return next(err);
+			
+			if (!client.user_id.equals(req.user._id))
+				return res.status(400).send('Bad request');
+			
+			save({
+				_id  : client._id,
+				name : req.body.client.name,
+				cui  : req.body.client.cui
+			});
+		});
+	} else {
+		save({
+			name : req.body.client.name,
+			cui  : req.body.client.cui
+		});
+	}
 });
 
 invoicesRouter.get('/:id', function(req, res, next) {
@@ -412,19 +423,35 @@ invoicesRouter.put('/:id', function(req, res, next) {
 		if (!invoice.user_id.equals(req.user._id))
 			return res.status(404).send('Not found');
 		
-		db.models.Client.findById(req.body.client_id, function (err, client) {
-			if (err)
-				return next(err);
-			
-			if (!invoice.user_id.equals(req.user._id))
-				return res.status(400).send('Bad request');
-			
+		var save = function (client) {
 			invoice.number = req.body.number;
+			invoice.client = client;
 			
 			invoice.save(function () {// TODO: maybe check for error
 				res.json(invoice);
 			})
-		});
+		};
+		
+		if (req.body.client._id) {
+			db.models.Client.findById(req.body.client._id, function (err, client) {
+				if (err || !client)
+					return next(err);
+				
+				if (!invoice.user_id.equals(req.user._id))
+					return res.status(400).send('Bad request');
+				
+				save({
+					_id  : client._id,
+					name : req.body.client.name,
+					cui  : req.body.client.cui
+				});
+			});
+		} else {
+			save({
+				name : req.body.client.name,
+				cui  : req.body.client.cui
+			});
+		}
 	});
 });
 
