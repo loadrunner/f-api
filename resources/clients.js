@@ -71,7 +71,19 @@ router.put('/:id', function(req, res, next) {
 		doc.bank_name    = req.body.bank_name;
 		doc.bank_account = req.body.bank_account;
 		
-		doc.save(function () {// TODO: maybe check for error
+		doc.save(function (err, doc) {
+			if (err) {
+				var result = {
+					message : err.message,
+					errors  : []
+				};
+				
+				for (var key in err.errors)
+					result.errors.push(err.errors[key].message);
+				
+				return res.status(400).json(result);
+			}
+			
 			res.json(doc);
 		})
 	});
