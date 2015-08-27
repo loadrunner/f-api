@@ -35,8 +35,8 @@ var UserSchema = mongoose.Schema({
 models.User = mongoose.model('User', UserSchema);
 
 var ClientSchema = mongoose.Schema({
-	_id          : { type : mongoose.Schema.Types.ObjectId, auto: true },
-	user_id      : mongoose.Schema.Types.ObjectId,
+	_id          : { type : mongoose.Schema.Types.ObjectId, auto : true },
+	user_id      : { type : mongoose.Schema.Types.ObjectId, required : true },
 	name         : { type : String, required : true, minlength : 2, maxlength : 100 },
 	cif          : { type : String, required : true },
 	address      : { type : String, required : false, minlength : 0, maxlength : 100 },
@@ -63,19 +63,28 @@ var InvoiceSchema = mongoose.Schema({
 	_id      : { type : mongoose.Schema.Types.ObjectId, auto: true },
 	user_id  : mongoose.Schema.Types.ObjectId,
 	client   : {
-		_id  : mongoose.Schema.Types.ObjectId,
-		name : String,
-		cui  : String
+		_id          : { type : mongoose.Schema.Types.ObjectId, required : false },
+		name         : { type : String, required : true, minlength : 2, maxlength : 100 },
+		cif          : { type : String, required : true },
+		address      : { type : String, required : false, minlength : 0, maxlength : 100 },
+		city         : { type : String, required : true, minlength : 3, maxlength : 50 },
+		county       : { type : String, required : true, minlength : 3, maxlength : 50 },
+		country      : { type : String, required : true, minlength : 3, maxlength : 50 },
+		bank_name    : { type : String, required : false, minlength : 0, maxlength : 50 },
+		bank_account : { type : String, required : false, minlength : 0, maxlength : 50 }
 	},
-	number   : String,
+	number   : { type : String, required: true },
 	products : [{
-		_id      : mongoose.Schema.Types.ObjectId,
+		_id      : { type : mongoose.Schema.Types.ObjectId, required : false },
 		name     : String,
 		price    : Number,
 		quantity : Number
 	}]
 });
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);
+models.Invoice.schema.path('client.cif').validate(function (value) {
+	return /^(RO)?([0-9]{5,14})$/i.test(value);
+}, 'Invalid CIF');
 
 exports.connection = db;
 exports.models = models;
