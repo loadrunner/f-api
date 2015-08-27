@@ -62,8 +62,14 @@ router.put('/:id', function(req, res, next) {
 		if (!doc.user_id.equals(req.user._id))
 			return res.status(404).send('Not found');
 		
-		doc.name = req.body.name;
-		doc.cui = req.body.cui;
+		doc.name         = req.body.name;
+		doc.cif          = req.body.cif;
+		doc.address      = req.body.address;
+		doc.city         = req.body.city;
+		doc.county       = req.body.county;
+		doc.country      = req.body.country;
+		doc.bank_name    = req.body.bank_name;
+		doc.bank_account = req.body.bank_account;
 		
 		doc.save(function () {// TODO: maybe check for error
 			res.json(doc);
