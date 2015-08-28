@@ -76,9 +76,9 @@ var InvoiceSchema = mongoose.Schema({
 	number   : { type : String, required: true },
 	products : [{
 		_id      : { type : mongoose.Schema.Types.ObjectId, required : false },
-		name     : String,
-		price    : Number,
-		quantity : Number
+		name     : { type : String, required: true, minlength : 1, maxlength : 100 },
+		price    : { type : Number, required: true, min : 0 },
+		quantity : { type : Number, required: true, min : 0 },
 	}]
 });
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);

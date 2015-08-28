@@ -93,6 +93,7 @@ router.put('/:id', function(req, res, next) {
 		var save = function (client) {
 			invoice.number = req.body.number;
 			invoice.client = client;
+			invoice.products = req.body.products || [];
 			
 			invoice.save(function (err, doc) {
 				if (err) {
@@ -153,5 +154,59 @@ router.delete('/:id', function(req, res, next) {
 		});
 	});
 });
+
+var products = function(req, res, next) {
+	var products = req.body;
+	if (!products || !Array.isArray(products) || products.length <= 0)
+		return res.status(400).send('Bad request');
+	
+	db.models.Invoice.findById(req.params.id, function (err, invoice) {
+		if (err)
+			return next(err);
+		
+		if (!invoice.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		db.models.Product.find({
+			user_id : req.user._id
+		}, function (err, allproducts) {
+			if (err)
+				return next(err);
+			
+			for (var i = 0; i < products.length; i++) {
+				if (products[i]._id) {
+					var found = false;
+					for (var j = 0; j < allproducts.length; j++)
+						if (products[i]._id == allproducts[j]._id) {
+							found = true;
+							break;
+						}
+					if (!found)
+						return res.status(400).send('Bad request');
+				}
+			}
+			
+			invoice.products = products;
+			
+			invoice.save(function (err, doc) {
+				if (err) {
+					var result = {
+						message : err.message,
+						errors  : []
+					};
+					
+					for (var key in err.errors)
+						result.errors.push(err.errors[key].message);
+					
+					return res.status(400).json(result);
+				}
+				
+				res.json(doc);
+			});
+		});
+	});
+};
+router.post('/:id/products', products);
+router.put('/:id/products', products);
 
 exports.router = router;
