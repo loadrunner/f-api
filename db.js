@@ -74,6 +74,7 @@ var InvoiceSchema = mongoose.Schema({
 		bank_account : { type : String, required : false, minlength : 0, maxlength : 50 }
 	},
 	number   : { type : String, required: true },
+	date     : { type : Date, required: true },
 	products : [{
 		_id      : { type : mongoose.Schema.Types.ObjectId, required : false },
 		name     : { type : String, required: true, minlength : 1, maxlength : 100 },

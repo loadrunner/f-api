@@ -24,7 +24,8 @@ router.post('/', function(req, res, next) {
 		db.models.Invoice.create({
 			user_id : req.user._id,
 			client  : client,
-			number  : req.body.number
+			number  : req.body.number,
+			date    : req.body.date
 		}, function (err, doc) {
 			if (err) {
 				var result = {
@@ -92,6 +93,7 @@ router.put('/:id', function(req, res, next) {
 		
 		var save = function (client) {
 			invoice.number = req.body.number;
+			invoice.date = req.body.date;
 			invoice.client = client;
 			invoice.products = req.body.products || [];
 			
