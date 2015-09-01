@@ -75,12 +75,18 @@ var InvoiceSchema = mongoose.Schema({
 	},
 	number   : { type : String, required: true },
 	date     : { type : Date, required: true },
+	due_date : { type : Date, required: true },
 	products : [{
 		_id      : { type : mongoose.Schema.Types.ObjectId, required : false },
 		name     : { type : String, required: true, minlength : 1, maxlength : 100 },
 		price    : { type : Number, required: true, min : 0 },
 		quantity : { type : Number, required: true, min : 0 },
-	}]
+	}],
+	author_name   : { type : String, required: false },
+	author_id     : { type : String, required: false },
+	delegate_name : { type : String, required: false },
+	delegate_id   : { type : String, required: false },
+	transport     : { type : String, required: false }
 });
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);
 models.Invoice.schema.path('client.cif').validate(function (value) {

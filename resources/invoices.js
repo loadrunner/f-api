@@ -22,10 +22,11 @@ router.post('/', function(req, res, next) {
 	
 	var save = function (client) {
 		db.models.Invoice.create({
-			user_id : req.user._id,
-			client  : client,
-			number  : req.body.number,
-			date    : req.body.date
+			user_id  : req.user._id,
+			client   : client,
+			number   : req.body.number,
+			date     : req.body.date,
+			due_date : req.body.due_date
 		}, function (err, doc) {
 			if (err) {
 				var result = {
@@ -92,11 +93,17 @@ router.put('/:id', function(req, res, next) {
 			return res.status(404).send('Not found');
 		
 		var save = function (client) {
-			invoice.number = req.body.number;
-			invoice.date = req.body.date;
-			invoice.client = client;
-			invoice.products = req.body.products || [];
-			
+			invoice.number        = req.body.number;
+			invoice.date          = req.body.date;
+			invoice.due_date      = req.body.due_date;
+			invoice.client        = client;
+			invoice.products      = req.body.products || [];
+			invoice.author_name   = req.body.author_name;
+			invoice.author_id     = req.body.author_id;
+			invoice.delegate_name = req.body.delegate_name;
+			invoice.delegate_id   = req.body.delegate_id;
+			invoice.transport     = req.body.transport;
+
 			invoice.save(function (err, doc) {
 				if (err) {
 					var result = {
