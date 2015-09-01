@@ -6,6 +6,8 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 	db.models.Invoice.find({ user_id : req.user._id })
 	.sort(utils.parseSort(req.query.sort, ['created_at', 'code', 'number'], { created_at : 1 }))
+	.skip(utils.parseOffset(req.query.offset))
+	.limit(utils.parseLimit(req.query.limit, 100, 50))
 	.exec(function (err, invoices) {
 		if (err)
 			return next(err);

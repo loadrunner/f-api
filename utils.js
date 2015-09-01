@@ -58,4 +58,28 @@ exports.parseSort = function (param, allowed, defaults) {
 		return sort;
 	else
 		return defaults;
-}
+};
+
+exports.parseLimit = function (param, max, def) {
+	if (!param)
+		return def;
+	
+	var limit = parseInt(param);
+	if (limit && limit > 0 && limit <= 100)
+		return limit;
+	else
+		return def;
+};
+
+exports.parseOffset = function (param, max) {
+	max = max || 10000;
+	
+	if (!param)
+		return undefined;
+	
+	var offset = parseInt(param);
+	if (offset && offset > 0 && offset <= max)
+		return offset;
+	else
+		return undefined;
+};
