@@ -6,6 +6,24 @@ db.on('error', function (err) {
 	process.code(1);
 });
 
+var timestampPlugin = function (schema, options) {
+	schema.add({
+		created_at : { type: Date },
+		updated_at : { type: Date }
+	});
+	
+	schema.pre('save', function (next) {
+		var now = Date.now();
+		
+		if (!this.created_at)
+			this.created_at = now;
+		
+		this.updated_at = now;
+		
+		next();
+	});
+};
+
 var models = {};
 
 var OAuthCodeSchema = mongoose.Schema({
@@ -14,6 +32,7 @@ var OAuthCodeSchema = mongoose.Schema({
 	redirect_uri : String,
 	user_id      : mongoose.Schema.Types.ObjectId
 });
+OAuthCodeSchema.plugin(timestampPlugin);
 models.OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 
 var OAuthAccessTokenSchema = mongoose.Schema({
@@ -21,6 +40,7 @@ var OAuthAccessTokenSchema = mongoose.Schema({
 	client_id : String, //oauth client
 	user_id   : mongoose.Schema.Types.ObjectId
 });
+OAuthAccessTokenSchema.plugin(timestampPlugin);
 models.OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
 var UserSchema = mongoose.Schema({
@@ -32,6 +52,7 @@ var UserSchema = mongoose.Schema({
 	last_name  : String,
 	phone      : String
 });
+UserSchema.plugin(timestampPlugin);
 models.User = mongoose.model('User', UserSchema);
 
 var ClientSchema = mongoose.Schema({
@@ -46,6 +67,7 @@ var ClientSchema = mongoose.Schema({
 	bank_name    : { type : String, required : false, minlength : 0, maxlength : 50 },
 	bank_account : { type : String, required : false, minlength : 0, maxlength : 50 }
 });
+ClientSchema.plugin(timestampPlugin);
 models.Client = mongoose.model('Client', ClientSchema);
 models.Client.schema.path('cif').validate(function (value) {
 	return /^(RO)?([0-9]{5,14})$/i.test(value);
@@ -57,6 +79,7 @@ var ProductSchema = mongoose.Schema({
 	name    : String,
 	price   : Number
 });
+ProductSchema.plugin(timestampPlugin);
 models.Product = mongoose.model('Product', ProductSchema);
 
 var InvoiceSchema = mongoose.Schema({
@@ -89,6 +112,7 @@ var InvoiceSchema = mongoose.Schema({
 	delegate_id   : { type : String, required: false },
 	transport     : { type : String, required: false }
 });
+InvoiceSchema.plugin(timestampPlugin);
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);
 models.Invoice.schema.path('client.cif').validate(function (value) {
 	return /^(RO)?([0-9]{5,14})$/i.test(value);
