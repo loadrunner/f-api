@@ -1,12 +1,12 @@
 var express = require('express');
 var db = require('../db');
-
+var utils = require('../utils.js');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-	db.models.Invoice.find({
-		user_id : req.user._id
-	}, function (err, invoices) {
+	db.models.Invoice.find({ user_id : req.user._id })
+	.sort(utils.parseSort(req.query.sort, ['created_at', 'code', 'number'], { created_at : 1 }))
+	.exec(function (err, invoices) {
 		if (err)
 			return next(err);
 		

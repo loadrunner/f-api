@@ -32,3 +32,30 @@ exports.uid = function(len) {
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+exports.parseSort = function (param, allowed, defaults) {
+	if (!param)
+		return defaults;
+	
+	var sort = {};
+	var params = param.split(',');
+	params.forEach(function (param) {
+		var sign = 1;
+		if (param.charAt(0) == '-') {
+			sign = -1;
+			param = param.substr(1)
+		} else if (param.charAt(0) == '+') {
+			sign = 1;
+			param = param.substr(1)
+		}
+		
+		if (param && allowed.indexOf(param) >= 0) {
+			sort[param] = sign;
+		}
+	});
+	
+	if (sort)
+		return sort;
+	else
+		return defaults;
+}
