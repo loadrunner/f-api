@@ -24,6 +24,7 @@ router.post('/', function(req, res, next) {
 		db.models.Invoice.create({
 			user_id  : req.user._id,
 			client   : client,
+			code     : req.body.code,
 			number   : req.body.number,
 			date     : req.body.date,
 			due_date : req.body.due_date
@@ -93,6 +94,7 @@ router.put('/:id', function(req, res, next) {
 			return res.status(404).send('Not found');
 		
 		var save = function (client) {
+			invoice.code          = req.body.code;
 			invoice.number        = req.body.number;
 			invoice.date          = req.body.date;
 			invoice.due_date      = req.body.due_date;
