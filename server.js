@@ -189,7 +189,7 @@ app.get('/oauth/login', function (req, res) {
 app.post('/oauth/login', passport.authenticate('local', { successReturnToOrRedirect : '/oauth/authorize', failureRedirect : '/oauth/login' }));
 
 app.get('/oauth/authorize', login.ensureLoggedIn('/oauth/login'),
-//passport.authenticate(['local'], { session : false }),
+
 oauth.authorization(function(clientId, redirectURI, done) {
 	console.log("authxx");
 	for (var i = 0; i < oauthApps.length; i++)
@@ -205,13 +205,6 @@ function(req, res){
 app.post('/oauth/authorize', /*login.ensureLoggedIn('/oauth/login'), */oauth.decision());
 
 app.post('/oauth/token', passport.authenticate([/*'basic', */'oauth2-client-password'], { session : false }), oauth.token(), oauth.errorHandler());
-
-app.get('/first_endpoint', passport.authenticate('bearer', { session : false }), function (req, res) {
-	res.json({
-		"co" : "fo",
-		"user" : req.user
-	});
-});
 
 app.use('/clients', passport.authenticate('bearer', { session : false }), clients.router);
 app.use('/products', passport.authenticate('bearer', { session : false }), products.router);

@@ -3,6 +3,9 @@ mongoose.connect('mongodb://localhost/facturi');
 var db = mongoose.connection;
 db.on('error', function (err) {
 	console.log("MongoDB error: %s", err);
+	if (err)
+		return;
+	
 	process.code(1);
 });
 
