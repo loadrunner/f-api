@@ -13,6 +13,7 @@ var utils = require('./utils');
 var clients = require('./resources/clients.js');
 var products = require('./resources/products.js');
 var invoices = require('./resources/invoices.js');
+var receipts = require('./resources/receipts.js');
 var users = require('./resources/users.js');
 
 app.set('views', __dirname + '/views');
@@ -209,6 +210,7 @@ app.post('/oauth/token', passport.authenticate([/*'basic', */'oauth2-client-pass
 app.use('/clients', passport.authenticate('bearer', { session : false }), clients.router);
 app.use('/products', passport.authenticate('bearer', { session : false }), products.router);
 app.use('/invoices', passport.authenticate('bearer', { session : false }), invoices.router);
+app.use('/receipts', passport.authenticate('bearer', { session : false }), receipts.router);
 app.use('/users', passport.authenticate('bearer', { session : false }), users.router);
 
 app.listen(3000);

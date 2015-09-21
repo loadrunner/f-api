@@ -48,7 +48,6 @@ router.post('/', function(req, res, next) {
 	};
 	
 	var client = {
-		user_id      : req.user._id,
 		name         : req.body.client.name,
 		cif          : req.body.client.cif,
 		address      : req.body.client.address,
@@ -126,7 +125,6 @@ router.put('/:id', function(req, res, next) {
 		};
 		
 		var client = {
-			user_id      : req.user._id,
 			name         : req.body.client.name,
 			cif          : req.body.client.cif,
 			address      : req.body.client.address,

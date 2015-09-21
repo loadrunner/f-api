@@ -65,8 +65,8 @@ var ClientSchema = mongoose.Schema({
 	cif          : { type : String, required : true },
 	address      : { type : String, required : false, minlength : 0, maxlength : 100 },
 	city         : { type : String, required : true, minlength : 3, maxlength : 50 },
-	county       : { type : String, required : true, minlength : 3, maxlength : 50 },
-	country      : { type : String, required : true, minlength : 3, maxlength : 50 },
+	county       : { type : String, required : true, minlength : 2, maxlength : 50 },
+	country      : { type : String, required : true, minlength : 2, maxlength : 50 },
 	bank_name    : { type : String, required : false, minlength : 0, maxlength : 50 },
 	bank_account : { type : String, required : false, minlength : 0, maxlength : 50 }
 });
@@ -94,8 +94,8 @@ var InvoiceSchema = mongoose.Schema({
 		cif          : { type : String, required : true },
 		address      : { type : String, required : false, minlength : 0, maxlength : 100 },
 		city         : { type : String, required : true, minlength : 3, maxlength : 50 },
-		county       : { type : String, required : true, minlength : 3, maxlength : 50 },
-		country      : { type : String, required : true, minlength : 3, maxlength : 50 },
+		county       : { type : String, required : true, minlength : 2, maxlength : 50 },
+		country      : { type : String, required : true, minlength : 2, maxlength : 50 },
 		bank_name    : { type : String, required : false, minlength : 0, maxlength : 50 },
 		bank_account : { type : String, required : false, minlength : 0, maxlength : 50 }
 	},
@@ -118,6 +118,31 @@ var InvoiceSchema = mongoose.Schema({
 InvoiceSchema.plugin(timestampPlugin);
 models.Invoice = mongoose.model('Invoice', InvoiceSchema);
 models.Invoice.schema.path('client.cif').validate(function (value) {
+	return /^(RO)?([0-9]{5,14})$/i.test(value);
+}, 'Invalid CIF');
+
+var ReceiptSchema = mongoose.Schema({
+	_id        : { type : mongoose.Schema.Types.ObjectId, auto: true },
+	user_id    : { type : mongoose.Schema.Types.ObjectId, required : true },
+	invoice_id : { type : mongoose.Schema.Types.ObjectId, required : false },
+	client     : {
+		_id          : { type : mongoose.Schema.Types.ObjectId, required : false },
+		name         : { type : String, required : true, minlength : 2, maxlength : 100 },
+		cif          : { type : String, required : true },
+		address      : { type : String, required : false, minlength : 0, maxlength : 100 },
+		city         : { type : String, required : true, minlength : 3, maxlength : 50 },
+		county       : { type : String, required : true, minlength : 2, maxlength : 50 },
+		country      : { type : String, required : true, minlength : 2, maxlength : 50 }
+	},
+	code        : { type : String, required: true },
+	number      : { type : Number, required: true },
+	date        : { type : Date, required: true },
+	value       : { type : Number, required: true, min : 0.0001 },
+	description : { type : String, required: false }
+});
+ReceiptSchema.plugin(timestampPlugin);
+models.Receipt = mongoose.model('Receipt', ReceiptSchema);
+models.Receipt.schema.path('client.cif').validate(function (value) {
 	return /^(RO)?([0-9]{5,14})$/i.test(value);
 }, 'Invalid CIF');
 
