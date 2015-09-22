@@ -220,4 +220,25 @@ var products = function(req, res, next) {
 router.post('/:id/products', products);
 router.put('/:id/products', products);
 
+router.get('/:id/receipts', function(req, res, next) {
+	db.models.Invoice.findById(req.params.id, function (err, invoice) {
+		if (err)
+			return next(err);
+		
+		if (!invoice.user_id.equals(req.user._id))
+			return res.status(404).send('Not found');
+		
+		db.models.Receipt.find({ user_id : req.user._id, invoice_id : invoice._id })
+		.sort(utils.parseSort(req.query.sort, ['created_at', 'code', 'number'], { created_at : 1 }))
+		.skip(utils.parseOffset(req.query.offset))
+		.limit(utils.parseLimit(req.query.limit, 100, 50))
+		.exec(function (err, receipts) {
+			if (err)
+				return next(err);
+			
+			res.json(receipts);
+		});
+	});
+});
+
 exports.router = router;
